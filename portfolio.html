@@ -689,7 +689,7 @@
       opacity: .62;
     }
 
-    /* ============ showreel frame ============ */
+    /* ============ promotional reel frame ============ */
     .reel-ring {
       position: absolute;
       inset: -18px;
@@ -736,7 +736,7 @@
       }
     }
 
-    /* rotating showreel badge */
+    /* rotating promotional reel badge */
     .reel-badge {
       position: absolute;
       left: -46px;
@@ -845,15 +845,12 @@
       width: 300px;
       height: 400px;
     }
-
-    @media(max-width:560px) {
-      .port-swiper .swiper-slide {
-        width: 250px;
-        height: 334px;
-      }
+    @media (max-width: 560px) {
+      .port-swiper .swiper-slide { width: 250px; height: 334px; }
     }
 
     .port-card {
+      height: 100%;
       transition: transform .4s cubic-bezier(.16, 1, .3, 1);
     }
 
@@ -865,9 +862,41 @@
       transition: transform .7s cubic-bezier(.16, 1, .3, 1);
     }
 
+    /* videos keep their own aspect ratio (letterboxed) instead of being cropped to the card —
+       the letterbox bars get the site's purple glass treatment instead of flat black */
+    .port-card video {
+      object-fit: contain;
+      background:
+        radial-gradient(140% 100% at 50% 0%, rgba(139, 92, 255, .3), transparent 62%),
+        linear-gradient(165deg, rgba(139, 92, 255, .18), rgba(17, 17, 19, .96));
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
     .port-card:hover img {
       transform: scale(1.06);
     }
+
+    /* mute/unmute toggle on video cards */
+    .port-mute-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 2;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(8, 8, 8, .55);
+      border: 1px solid rgba(255, 255, 255, .18);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      color: #fff;
+      font-size: 12px;
+      transition: background .2s, border-color .2s;
+    }
+    .port-mute-btn:hover { background: rgba(139, 92, 255, .35); border-color: rgba(139, 92, 255, .6); }
 
     .tab-btn.active {
       color: #fff;
@@ -1156,6 +1185,34 @@
       opacity: 0;
     }
 
+    /* ============ mailto copy confirmation ============ */
+    .copy-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      z-index: 200;
+      max-width: min(90vw, 420px);
+      transform: translate(-50%, 12px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s ease, transform .3s ease;
+      background: rgba(23, 23, 25, .92);
+      border: 1px solid rgba(139, 92, 255, .4);
+      box-shadow: 0 0 30px -8px rgba(139, 92, 255, .6);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 999px;
+      padding: 10px 20px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #fff;
+      text-align: center;
+    }
+    .copy-toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
     @media (prefers-reduced-motion: reduce) {
       html {
         scroll-behavior: auto;
@@ -1175,6 +1232,7 @@
       .svc-card,
       .port-card,
       .port-card img,
+      .port-card video,
       .logo-tile,
       .do-chip,
       .reel-badge-core {
@@ -1286,7 +1344,7 @@
         </div>
       </div>
 
-      <!-- showreel monitor -->
+      <!-- promotional reel monitor -->
       <div data-hero-rv class="relative max-w-md w-full mx-auto lg:mx-0">
         <div class="reel-ring"></div>
         <div class="glass rounded-3xl overflow-hidden relative">
@@ -1294,12 +1352,14 @@
             <span class="flex gap-1.5"><i class="w-2.5 h-2.5 rounded-full bg-[#ff5f57] block"></i><i
                 class="w-2.5 h-2.5 rounded-full bg-[#febc2e] block"></i><i
                 class="w-2.5 h-2.5 rounded-full bg-[#28c840] block"></i></span>
-            <span class="font-mono text-[11px] text-dim">showreel.mp4</span>
+            <span class="font-mono text-[11px] text-dim">promotional-reel.mp4</span>
             <span class="font-mono text-[11px] text-dim tabular-nums" id="reelTC">00:00</span>
           </div>
           <div class="relative aspect-[4/5] bg-black cursor-pointer" id="reelStage">
             <video id="reelVideo" src="assets/1.mp4" autoplay muted loop playsinline preload="metadata"
-              class="absolute inset-0 w-full h-full object-cover" aria-label="MilanCreates showreel"></video>
+              class="absolute inset-0 w-full h-full object-cover" aria-label="MilanCreates promotional reel"></video>
+            <button id="reelMute" type="button" class="port-mute-btn" aria-pressed="false" aria-label="Unmute video">
+              <i class="fa-solid fa-volume-xmark"></i></button>
             <div id="reelPlay"
               class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full glass grid place-items-center opacity-0 transition-opacity">
               <i class="fa-solid fa-pause" id="reelIcon"></i>
@@ -1364,9 +1424,6 @@
           Videos</button>
         <button
           class="tab-btn rounded-full border border-line px-5 py-2 text-[13.5px] text-dim font-head transition-colors hover:text-white">Reels</button>
-        <button
-          class="tab-btn rounded-full border border-line px-5 py-2 text-[13.5px] text-dim font-head transition-colors hover:text-white">Logo
-          Designs</button>
       </div>
       <div class="swiper port-swiper" data-rv>
         <div class="swiper-wrapper" id="portGrid"></div>
@@ -1468,7 +1525,7 @@
               </div>
             </div>
 
-            <!-- rotating showreel badge -->
+            <!-- rotating promotional reel badge -->
             <a href="#portfolio" class="reel-badge cursor-pointer group" aria-label="See featured work">
               <svg viewBox="0 0 120 120" class="reel-badge-text" aria-hidden="true">
                 <defs>
@@ -1476,7 +1533,7 @@
                 </defs>
                 <text>
                   <textPath href="#badgeArc" startOffset="0">
-                    SHOWREEL · FEATURED WORK · SHOWREEL · FEATURED WORK ·</textPath>
+                    PROMOTIONAL REEL · FEATURED WORK · PROMOTIONAL REEL ·</textPath>
                 </text>
               </svg>
               <span class="reel-badge-core group-hover:scale-105"><i
@@ -1534,7 +1591,7 @@
         <h2 data-rv class="font-head font-bold tracking-tight text-[clamp(30px,4vw,48px)] mb-4">
           Where your content gets <span class="grad-text">made.</span></h2>
         <p data-rv class="text-dim max-w-md leading-relaxed mb-8">A colour-calibrated edit bay running Premiere,
-          After Effects and Resolve — built so nothing slows the work down. Scroll to turn it.</p>
+          After Effects and Resolve — built so nothing slows the work down. Drag it to turn it.</p>
         <ul data-rv class="grid sm:grid-cols-2 gap-x-6 gap-y-3 max-w-md text-sm text-dim">
           <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-vhi text-xs"></i>4K timeline playback
           </li>
@@ -1603,6 +1660,32 @@
         <div><b class="font-head font-bold text-2xl grad-text">Thumbnails</b>
           <p class="text-xs text-dim mt-1.5">Click-worthy, not clickbait</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= THE RIG 3D (pc-futuristic/pc.obj) ================= -->
+  <section class="py-24 md:py-28 relative overflow-hidden bg-graphite/60" id="rigstation"
+    aria-label="Inside the rig">
+    <div class="orb w-[400px] h-[400px] bg-cyan right-1/4 top-0" style="opacity:.12"></div>
+    <div class="max-w-site mx-auto px-6 grid lg:grid-cols-2 gap-10 items-center relative">
+      <div>
+        <p data-rv class="font-mono text-xs tracking-[.25em] uppercase text-dim mb-4">Inside The Rig</p>
+        <h2 data-rv class="font-head font-bold tracking-tight text-[clamp(30px,4vw,48px)] mb-4">
+          Every part <span class="grad-text">earns its slot.</span></h2>
+        <p data-rv class="text-dim max-w-md leading-relaxed mb-8">Nothing in here is for the RGB. The GPU carries the
+          effects passes, the RAM holds the timeline, and the NVMe means footage never waits on a disk. Scroll to
+          turn it.</p>
+        <div data-rv class="flex flex-wrap gap-2.5">
+          <span class="glass rounded-full px-4 py-1.5 text-xs text-dim">GPU render</span>
+          <span class="glass rounded-full px-4 py-1.5 text-xs text-dim">64GB RAM</span>
+          <span class="glass rounded-full px-4 py-1.5 text-xs text-dim">NVMe scratch</span>
+          <span class="glass rounded-full px-4 py-1.5 text-xs text-dim">Silent cooling</span>
+        </div>
+      </div>
+      <div class="relative h-[320px] md:h-[440px]" id="rigStage">
+        <canvas id="pcRig"
+          class="absolute inset-0 w-full h-full opacity-0 transition-opacity duration-1000 pointer-events-none"></canvas>
       </div>
     </div>
   </section>
@@ -1706,7 +1789,7 @@
             target="_blank" rel="noopener" data-magnet
             class="rounded-full px-8 py-3.5 font-head font-semibold bg-gradient-to-r from-violet to-vhi glow-violet hover:opacity-90 transition-opacity">
             <i class="fa-brands fa-whatsapp mr-2"></i>WhatsApp Me</a>
-          <a href="mailto:23milansharma@gmail.com?subject=Project%20Inquiry%20MilanCreates" data-magnet
+          <a href="mailto:milancreates04@gmail.com?subject=Project%20Inquiry%20MilanCreates" data-magnet
             class="rounded-full px-8 py-3.5 font-head font-semibold border border-line hover:border-violet transition-colors">
             <i class="fa-solid fa-envelope mr-2"></i>Email Me</a>
           <a href="https://www.instagram.com/hey_milan_040" target="_blank" rel="noopener" data-magnet
@@ -1740,7 +1823,7 @@
           <a href="https://wa.me/918233639491" target="_blank" rel="noopener" aria-label="WhatsApp"
             class="w-10 h-10 rounded-full border border-line grid place-items-center text-dim hover:text-white hover:border-violet transition-colors"><i
               class="fa-brands fa-whatsapp"></i></a>
-          <a href="mailto:23milansharma@gmail.com" aria-label="Email"
+          <a href="mailto:milancreates04@gmail.com" aria-label="Email"
             class="w-10 h-10 rounded-full border border-line grid place-items-center text-dim hover:text-white hover:border-violet transition-colors"><i
               class="fa-solid fa-envelope"></i></a>
         </div>
@@ -1907,22 +1990,27 @@
           <span class="text-[10.5px] text-dim block mt-1 leading-tight">${l}</span></span>
       </div>`).join('');
 
-    /* portfolio (seeded placeholder stills — swap for real work) */
+    /* portfolio — every slide plays a real local export; the one still is the logo work */
     const projects = [
-      { t: 'Luxury Skincare UGC Ad', cat: 'UGC Ads', dur: '0:29', seed: 'skincare-ugc-editorial' },
-      { t: 'Premium Watch Commercial', cat: 'Meta Ads', dur: '0:31', seed: 'watch-commercial-dark' },
-      { t: 'Fitness Transformation Reel', cat: 'Reels', dur: '0:15', seed: 'fitness-gym-reel' },
-      { t: 'Tech Product Launch', cat: 'AI Videos', dur: '0:28', seed: 'tech-product-launch' },
-      { t: 'AI Fashion Commercial', cat: 'AI Videos', dur: '0:30', seed: 'fashion-editorial-ai' },
-      { t: 'Restaurant Promo Reel', cat: 'Reels', dur: '0:18', seed: 'restaurant-food-promo' },
-      { t: 'Voltix Fitness Brand Identity', cat: 'Logo Designs', dur: '', seed: 'brand-identity-studio' },
-      { t: 'Wellness UGC Ad', cat: 'UGC Ads', dur: '0:24', seed: 'wellness-lifestyle-ugc' }
+      { t: 'Luxury Skincare UGC Ad', cat: 'UGC Ads', video: 'assets/video/5.mp4' },
+      { t: 'Premium Watch Commercial', cat: 'Meta Ads', video: 'assets/video/4.mp4' },
+      { t: 'Fitness Transformation Reel', cat: 'Reels', video: 'assets/video/2.mp4' },
+      { t: 'Tech Product Launch', cat: 'AI Videos', video: 'assets/video/1.mp4' },
+      { t: 'Restaurant Promo Reel', cat: 'Reels', video: 'assets/video/3.mp4' }
     ];
+
     document.getElementById('portGrid').innerHTML = projects.map(p => `
       <div class="swiper-slide" data-cat="${p.cat}">
-        <div class="port-card glass rounded-2xl overflow-hidden relative h-full flex flex-col justify-end cursor-pointer">
-          <img src="https://picsum.photos/seed/${p.seed}/600/800" alt="${p.t}" loading="lazy"
-            class="absolute inset-0 w-full h-full object-cover">
+        <div class="port-card glass rounded-2xl overflow-hidden relative flex flex-col justify-end cursor-pointer">
+          ${p.video ? `
+            <video class="absolute inset-0 w-full h-full object-cover" src="${p.video}"
+              muted loop playsinline preload="none" aria-label="${p.t}"></video>
+            <button class="port-mute-btn" aria-pressed="false" aria-label="Unmute video">
+              <i class="fa-solid fa-volume-xmark"></i></button>
+          ` : `
+            <img src="https://picsum.photos/seed/${p.seed}/600/800" alt="${p.t}" loading="lazy"
+              class="absolute inset-0 w-full h-full object-cover">
+          `}
           <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent"></div>
           ${p.dur ? `<span class="absolute top-3.5 right-3.5 font-mono text-[11px] px-2.5 py-1 rounded-md bg-black/60 tabular-nums">${p.dur}</span>` : ''}
           <div class="relative p-5">
@@ -1938,11 +2026,36 @@
       navigation: { nextEl: '#portNext', prevEl: '#portPrev' }, keyboard: { enabled: true },
       on: { progress(s) { portProgress.style.width = Math.max(.16, s.progress) * 100 + '%'; } }
     });
+
+    /* videos only play while their slide is actually on screen — with clips this size,
+       autoplaying all of them at once regardless of visibility would be a real data/CPU cost.
+       Slides stay in the DOM when a tab filters them out (just display:none), so one observer
+       bound once at load covers every video for the life of the page. */
+    if (!REDUCED) {
+      const portVideoIO = new IntersectionObserver(entries => {
+        entries.forEach(en => en.isIntersecting ? en.target.play().catch(() => { }) : en.target.pause());
+      }, { threshold: 0.35 });
+      document.querySelectorAll('.port-swiper video').forEach(v => portVideoIO.observe(v));
+    }
+
+    document.querySelector('.port-swiper').addEventListener('click', e => {
+      const btn = e.target.closest('.port-mute-btn');
+      if (!btn) return;
+      const v = btn.closest('.port-card').querySelector('video');
+      v.muted = !v.muted;
+      btn.setAttribute('aria-pressed', String(!v.muted));
+      btn.setAttribute('aria-label', v.muted ? 'Unmute video' : 'Mute video');
+      btn.innerHTML = `<i class="fa-solid ${v.muted ? 'fa-volume-xmark' : 'fa-volume-high'}"></i>`;
+    });
+
     const tabs = document.querySelectorAll('#portTabs .tab-btn');
     tabs.forEach(tab => tab.addEventListener('click', () => {
       tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      const cat = tab.textContent.trim();
+      // several tab labels wrap across two source lines (e.g. "AI\n  Videos"), so a plain
+      // .trim() leaves the internal newline/indentation in place and it never matches the
+      // project's single-space category string — collapse all internal whitespace too
+      const cat = tab.textContent.trim().replace(/\s+/g, ' ');
       document.querySelectorAll('.port-swiper .swiper-slide').forEach(sl => {
         sl.style.display = (cat === 'All Works' || sl.dataset.cat === cat) ? '' : 'none';
       });
@@ -2107,7 +2220,7 @@
       if (document.fonts) document.fonts.ready.then(refresh);
     })();
 
-    /* ============ showreel player ============ */
+    /* ============ promotional reel player ============ */
     (function () {
       const v = document.getElementById('reelVideo');
       const stage = document.getElementById('reelStage');
@@ -2120,6 +2233,18 @@
         icon.className = v.paused ? 'fa-solid fa-play' : 'fa-solid fa-pause';
         playBtn.style.opacity = v.paused ? 1 : '';
       };
+      /* mute toggle lives inside the stage, so it has to claim the click before the
+         stage's play/pause handler sees it */
+      const muteBtn = document.getElementById('reelMute');
+      muteBtn?.addEventListener('click', e => {
+        e.stopPropagation();
+        v.muted = !v.muted;
+        if (!v.muted) { v.volume = 1; v.play().catch(() => { }); }
+        muteBtn.setAttribute('aria-pressed', String(!v.muted));
+        muteBtn.setAttribute('aria-label', v.muted ? 'Unmute video' : 'Mute video');
+        muteBtn.innerHTML = `<i class="fa-solid ${v.muted ? 'fa-volume-xmark' : 'fa-volume-high'}"></i>`;
+      });
+
       stage.addEventListener('click', () => v.paused ? v.play() : v.pause());
       stage.addEventListener('mouseenter', () => playBtn.style.opacity = 1);
       stage.addEventListener('mouseleave', () => { if (!v.paused) playBtn.style.opacity = ''; });
@@ -2254,6 +2379,29 @@
     });
     mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.add('hidden')));
 
+    /* ============ mailto fallback ============ *
+     * a mailto: link only visibly does something if the OS has a default mail client set up —
+     * with none configured (common) clicking it looks broken, even though the link is correct.
+     * Copy the address to the clipboard alongside it, so the click always gives feedback. */
+    (function () {
+      const toast = document.createElement('div');
+      toast.className = 'copy-toast';
+      toast.setAttribute('role', 'status');
+      document.body.appendChild(toast);
+      let hideTimer;
+      document.querySelectorAll('a[href^="mailto:"]').forEach(a => {
+        a.addEventListener('click', () => {
+          const email = a.href.replace('mailto:', '').split('?')[0];
+          navigator.clipboard?.writeText(decodeURIComponent(email)).then(() => {
+            toast.textContent = `Copied ${decodeURIComponent(email)} — pasting it works even if no mail app opens`;
+            toast.classList.add('show');
+            clearTimeout(hideTimer);
+            hideTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+          }).catch(() => { });
+        });
+      });
+    })();
+
   </script>
 
   <!-- ============ hero 3D — real .glb camera model (lazy module; procedural fallback) ============ -->
@@ -2278,11 +2426,54 @@
 
     /* ---- generic scroll-driven .glb stage: one per model section ---- */
     if (reduced) {
-      ['workstation', 'aistation', 'gamestation'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
+      ['workstation', 'aistation', 'gamestation', 'rigstation'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
     } else {
-      mountGLB('pc3d', 'assets/pc1.glb', { section: 'workstation', target: 4.4, camZ: 7, camY: .5, turns: 1 });
-      mountGLB('cta3d', 'assets/pc2.glb', { section: 'aistation', target: 3.8, camZ: 7, camY: .3, turns: .75, spin: .18 });
+      mountGLB('pc3d', 'assets/pc1.glb', { section: 'workstation', target: 4.4, camZ: 7, camY: .5, drag: true, spin: .25 });
+      mountGLB('cta3d', 'assets/pc2.glb', { section: 'aistation', target: 3.8, camZ: 7, camY: .3, turns: .75, spin: .18, mtl: 'assets/pc-futuristic/pc.mtl' });
       mountGLB('pc3dGame', 'assets/pc3.glb', { section: 'gamestation', target: 5, camZ: 7.5, camY: .4, turns: 1.25, baseY: -.8 });
+      mountGLB('pcRig', 'assets/pc-futuristic/pc.obj', { section: 'rigstation', target: 4.6, camZ: 7.5, camY: .4, turns: 1, spin: .1 });
+    }
+
+    /* Loads `url` — .glb via GLTFLoader, .obj via MTLLoader+OBJLoader — and returns its root Object3D.
+       cfg.mtl re-materialises a .glb from a .mtl (see loadMTL). */
+    async function loadModel(THREE, url, cfg = {}) {
+      let root;
+      if (url.endsWith('.obj')) {
+        const { OBJLoader } = await import('three/addons/loaders/OBJLoader.js');
+        const base = url.slice(0, url.lastIndexOf('/') + 1);
+        const lib = await loadMTL(url.slice(0, -4) + '.mtl');
+        root = await new OBJLoader().setMaterials(lib).setPath(base).loadAsync(url.slice(base.length));
+      } else {
+        const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+        root = (await new GLTFLoader().loadAsync(url)).scene;
+        // pc2.glb is this same PC exported with no textures at all — every material is flat white.
+        // Its materials kept their Maya shading-group names, so the .mtl re-attaches the maps by name.
+        if (cfg.mtl) {
+          const lib = await loadMTL(cfg.mtl);
+          const swap = m => lib.materials[m.name] || m;
+          root.traverse(o => {
+            if (o.isMesh) o.material = Array.isArray(o.material) ? o.material.map(swap) : swap(o.material);
+          });
+        }
+      }
+      root.traverse(o => {
+        if (!o.isMesh) return;
+        for (const m of [o.material].flat()) {
+          // the Maya export gives every textured material Kd 0 0 0, which multiplies its diffuse map to black
+          if (m.map) { m.color.setScalar(1); m.map.colorSpace = THREE.SRGBColorSpace; }
+          // MTLLoader ignores Tf, so the tempered-glass panel loads as an opaque slab over the internals
+          if (m.name === 'blinn24SG') { m.transparent = true; m.opacity = .16; m.depthWrite = false; }
+        }
+      });
+      return root;
+    }
+
+    async function loadMTL(url) {
+      const { MTLLoader } = await import('three/addons/loaders/MTLLoader.js');
+      const base = url.slice(0, url.lastIndexOf('/') + 1);
+      const lib = await new MTLLoader().setPath(base).setResourcePath(base).loadAsync(url.slice(base.length));
+      lib.preload(); // builds lib.materials, keyed by shading-group name
+      return lib;
     }
 
     function mountGLB(id, url, cfg) {
@@ -2295,10 +2486,9 @@
 
       async function build() {
         const THREE = await import('three');
-        let gltf;
+        let loaded;
         try {
-          const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
-          gltf = await new GLTFLoader().loadAsync(url);
+          loaded = await loadModel(THREE, url, cfg);
         } catch (e) {
           // model unavailable (e.g. file:// preview) — hide the empty stage
           if (cfg.section) document.getElementById(cfg.section)?.classList.add('hidden');
@@ -2317,7 +2507,7 @@
         const cyn = new THREE.PointLight(0x00d9ff, 22, 60); cyn.position.set(6, -3, 4); scene.add(cyn);
 
         const rig = new THREE.Group(); scene.add(rig);
-        const model = gltf.scene;
+        const model = loaded;
         const box = new THREE.Box3().setFromObject(model);
         const size = box.getSize(new THREE.Vector3());
         const center = box.getCenter(new THREE.Vector3());
@@ -2335,6 +2525,28 @@
         let visible = true;
         new IntersectionObserver(en => visible = en[0].isIntersecting).observe(wrap);
 
+        // cfg.drag: the stage spins on its own and the pointer turns it, instead of the scroll driving it
+        let dragX = 0, dragY = 0;
+        if (cfg.drag) {
+          let held = false, lx = 0, ly = 0;
+          cv.style.pointerEvents = 'auto';
+          cv.style.cursor = 'grab';
+          cv.style.touchAction = 'pan-y'; // a vertical swipe still scrolls the page on touch
+          cv.addEventListener('pointerdown', e => {
+            held = true; lx = e.clientX; ly = e.clientY;
+            cv.setPointerCapture(e.pointerId); cv.style.cursor = 'grabbing';
+          });
+          cv.addEventListener('pointermove', e => {
+            if (!held) return;
+            dragX += (e.clientX - lx) * .009;
+            dragY = Math.max(-.55, Math.min(.55, dragY + (e.clientY - ly) * .006));
+            lx = e.clientX; ly = e.clientY;
+          });
+          const release = () => { held = false; cv.style.cursor = 'grab'; };
+          cv.addEventListener('pointerup', release);
+          cv.addEventListener('pointercancel', release);
+        }
+
         cv.style.opacity = 1;
         const clock = new THREE.Clock();
         (function tick() {
@@ -2343,9 +2555,9 @@
           const t = clock.getElapsedTime();
           // scroll progress of the stage through the viewport (0 → 1) drives rotation
           const r = wrap.getBoundingClientRect();
-          const prog = Math.min(1, Math.max(0, (innerHeight - r.top) / (innerHeight + r.height)));
-          rig.rotation.y = (cfg.baseY ?? -.4) + prog * Math.PI * 2 * (cfg.turns ?? 1) + t * (cfg.spin ?? 0);
-          rig.rotation.x = Math.sin(t * .4) * .05 + (cfg.tiltX ?? 0);
+          const prog = cfg.drag ? 0 : Math.min(1, Math.max(0, (innerHeight - r.top) / (innerHeight + r.height)));
+          rig.rotation.y = (cfg.baseY ?? -.4) + prog * Math.PI * 2 * (cfg.turns ?? 1) + t * (cfg.spin ?? 0) + dragX;
+          rig.rotation.x = Math.sin(t * .4) * .05 + (cfg.tiltX ?? 0) + dragY;
           rig.position.y = Math.sin(t * .8) * .1;
           renderer.render(scene, cam);
         })();
