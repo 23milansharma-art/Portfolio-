@@ -1061,6 +1061,25 @@
       box-shadow: 0 0 10px rgba(163, 126, 255, .85);
     }
 
+    /* mobile counterpart: a vertical track running down through the icon column */
+    .proc-track-v {
+      position: absolute;
+      left: 26px;                /* centre of the 52px mobile icon */
+      top: 26px;
+      bottom: 26px;
+      width: 2px;
+      margin-left: -1px;
+      background: rgba(255, 255, 255, .08);
+      z-index: 0;
+    }
+    @media (min-width: 768px) { .proc-track-v { display: none; } }
+
+    .proc-track-v .proc-track-fill {
+      transform-origin: top;
+      transform: scaleY(0);
+      background: linear-gradient(180deg, #8b5cff, #00D9FF);
+    }
+
     .proc-item {
       display: flex;
       flex-direction: column;
@@ -1352,7 +1371,7 @@
             <span class="flex gap-1.5"><i class="w-2.5 h-2.5 rounded-full bg-[#ff5f57] block"></i><i
                 class="w-2.5 h-2.5 rounded-full bg-[#febc2e] block"></i><i
                 class="w-2.5 h-2.5 rounded-full bg-[#28c840] block"></i></span>
-            <span class="font-mono text-[11px] text-dim">Promotional-reel.mp4</span>
+            <span class="font-mono text-[11px] text-dim">promotional-reel.mp4</span>
             <span class="font-mono text-[11px] text-dim tabular-nums" id="reelTC">00:00</span>
           </div>
           <div class="relative aspect-[4/5] bg-black cursor-pointer" id="reelStage">
@@ -1675,7 +1694,7 @@
           Every part <span class="grad-text">earns its slot.</span></h2>
         <p data-rv class="text-dim max-w-md leading-relaxed mb-8">Nothing in here is for the RGB. The GPU carries the
           effects passes, the RAM holds the timeline, and the NVMe means footage never waits on a disk. Scroll to
-          turn it.</p>
+          build it.</p>
         <div data-rv class="flex flex-wrap gap-2.5">
           <span class="glass rounded-full px-4 py-1.5 text-xs text-dim">GPU render</span>
           <span class="glass rounded-full px-4 py-1.5 text-xs text-dim">64GB RAM</span>
@@ -1707,6 +1726,9 @@
           <span class="proc-track-dot" style="left:40%"></span>
           <span class="proc-track-dot" style="left:60%"></span>
           <span class="proc-track-dot" style="left:80%"></span>
+        </div>
+        <div class="proc-track-v" aria-hidden="true">
+          <div id="procLineV" class="proc-track-fill"></div>
         </div>
         <div id="procGrid" class="grid md:grid-cols-5 gap-y-14 gap-x-6 relative text-left"></div>
       </div>
@@ -1992,11 +2014,11 @@
 
     /* portfolio — every slide plays a real local export; the one still is the logo work */
     const projects = [
-      { t: 'Luxury Skincare UGC Ad', cat: 'UGC Ads', video: 'assets/video/5.mp4' },
-      { t: 'Premium Watch Commercial', cat: 'Meta Ads', video: 'assets/video/4.mp4' },
-      { t: 'Fitness Transformation Reel', cat: 'Reels', video: 'assets/video/2.mp4' },
-      { t: 'Tech Product Launch', cat: 'AI Videos', video: 'assets/video/1.mp4' },
-      { t: 'Restaurant Promo Reel', cat: 'Reels', video: 'assets/video/3.mp4' }
+      { t: 'UGS ADS',  video: 'assets/video/5.mp4' },
+      { t: 'Meta Ads',  video: 'assets/video/4.mp4' },
+      { t: 'Reels', video: 'assets/video/2.mp4' },
+      { t: 'AI Videos', video: 'assets/video/1.mp4' },
+      { t: 'Reels',  video: 'assets/video/3.mp4' }
     ];
 
     document.getElementById('portGrid').innerHTML = projects.map(p => `
@@ -2014,7 +2036,7 @@
           <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent"></div>
           ${p.dur ? `<span class="absolute top-3.5 right-3.5 font-mono text-[11px] px-2.5 py-1 rounded-md bg-black/60 tabular-nums">${p.dur}</span>` : ''}
           <div class="relative p-5">
-            <div class="font-mono text-[10px] uppercase tracking-wider text-white/70">${p.cat}</div>
+
             <div class="font-head font-semibold mt-1">${p.t}</div>
           </div>
         </div>
@@ -2292,6 +2314,12 @@
         scaleX: 1, ease: 'none',
         scrollTrigger: { trigger: '#procGrid', start: 'top 80%', end: 'bottom 55%', scrub: 1 }
       });
+      /* mobile: same idea, drawn top → bottom down the icon column */
+      const procFillV = document.getElementById('procLineV');
+      if (procFillV) gsap.to(procFillV, {
+        scaleY: 1, ease: 'none',
+        scrollTrigger: { trigger: '#procGrid', start: 'top 75%', end: 'bottom 70%', scrub: 1 }
+      });
       gsap.utils.toArray('.orb').forEach((orb, i) => {
         gsap.to(orb, { yPercent: i % 2 ? 30 : -25, ease: 'none', scrollTrigger: { trigger: orb.parentElement, start: 'top bottom', end: 'bottom top', scrub: 1.2 } });
       });
@@ -2300,6 +2328,8 @@
       document.querySelectorAll('[data-count]').forEach(el => el.textContent = el.dataset.count);
       const procFill = document.getElementById('procLineH');
       if (procFill) procFill.style.transform = 'scaleX(1)';
+      const procFillV = document.getElementById('procLineV');
+      if (procFillV) procFillV.style.transform = 'scaleY(1)';
     }
 
     /* ============ contact: the signature writes itself, then the copy overlaps it ============ */
@@ -2431,7 +2461,9 @@
       mountGLB('pc3d', 'assets/pc1.glb', { section: 'workstation', target: 4.4, camZ: 7, camY: .5, drag: true, spin: .25 });
       mountGLB('cta3d', 'assets/pc2.glb', { section: 'aistation', target: 3.8, camZ: 7, camY: .3, turns: .75, spin: .18, mtl: 'assets/pc-futuristic/pc.mtl' });
       mountGLB('pc3dGame', 'assets/pc3.glb', { section: 'gamestation', target: 5, camZ: 7.5, camY: .4, turns: 1.25, baseY: -.8 });
-      mountGLB('pcRig', 'assets/pc-futuristic/pc.obj', { section: 'rigstation', target: 4.6, camZ: 7.5, camY: .4, turns: 1, spin: .1 });
+      // baseY parks the glass panel toward the camera and turns is kept small, so the build
+      // stays visible through the internals instead of spinning round to the blank steel side
+      mountGLB('pcRig', 'assets/pc-futuristic/pc.obj', { section: 'rigstation', target: 4.6, camZ: 8.5, camY: .4, turns: .16, baseY: 4.2, assemble: true });
     }
 
     /* Loads `url` — .glb via GLTFLoader, .obj via MTLLoader+OBJLoader — and returns its root Object3D.
@@ -2476,6 +2508,39 @@
       return lib;
     }
 
+    /* Exploded-view rig for cfg.assemble. The model's 104 meshes carry only Maya names
+       (pCube4, pCylinder6…), so which part is a panel and which is a component is inferred
+       from geometry: a mesh's dominant axis says which face of the chassis it belongs to,
+       and how far out it sits says whether it's shell or internals. Ordering by that
+       distance makes the motherboard and drives seat first and the panels close last. */
+    function explodeParts(THREE, model) {
+      model.updateMatrixWorld(true);
+      const box = new THREE.Box3().setFromObject(model);
+      const size = box.getSize(new THREE.Vector3());
+      const mid = box.getCenter(new THREE.Vector3());
+      const parts = [];
+      model.traverse(o => {
+        if (!o.isMesh) return;
+        const c = new THREE.Box3().setFromObject(o).getCenter(new THREE.Vector3()).sub(mid);
+        // offset per axis as a fraction of that axis's half-extent, so a flat wide model
+        // doesn't read as "everything belongs to the long axis"
+        const r = [c.x / (size.x / 2), c.y / (size.y / 2), c.z / (size.z / 2)];
+        const mag = r.map(Math.abs);
+        const ax = mag.indexOf(Math.max(...mag));
+        const out = new THREE.Vector3();
+        // travel scales with how far out the part already sits, so the shell lifts clear
+        // while internals only ease back a little — a flat distance sprays them off frame
+        const span = Math.max(size.x, size.y, size.z);
+        out.setComponent(ax, Math.sign(r[ax] || 1) * span * .2 * (.5 + mag[ax]));
+        parts.push({ mesh: o, base: o.position.clone(), out, reach: mag[ax] });
+      });
+      // stagger by how far out the part sits: innermost starts at 0, outermost at .62,
+      // leaving .38 of the scroll for the last panel to travel
+      parts.sort((a, b) => a.reach - b.reach)
+        .forEach((p, i) => p.t0 = (i / parts.length) * .62);
+      return parts;
+    }
+
     function mountGLB(id, url, cfg) {
       const cv = document.getElementById(id);
       if (!cv) return;
@@ -2514,6 +2579,7 @@
         model.position.sub(center);
         rig.add(model);
         rig.scale.setScalar((cfg.target ?? 4) / Math.max(size.x, size.y, size.z));
+        const parts = cfg.assemble ? explodeParts(THREE, model) : null;
 
         function resize() {
           const w = wrap.clientWidth, h = wrap.clientHeight;
@@ -2556,6 +2622,17 @@
           // scroll progress of the stage through the viewport (0 → 1) drives rotation
           const r = wrap.getBoundingClientRect();
           const prog = cfg.drag ? 0 : Math.min(1, Math.max(0, (innerHeight - r.top) / (innerHeight + r.height)));
+          if (parts) {
+            // prog spans the stage's whole trip across the viewport, but it is only actually
+            // on screen for the middle of that — so the build is squeezed into .18→.80,
+            // otherwise the last panel seats after the section has scrolled out of sight
+            const a = Math.min(1, Math.max(0, (prog - .18) / .62));
+            const ease = x => 1 - Math.pow(1 - x, 3); // decelerate in, so each part settles rather than snaps
+            for (const p of parts) {
+              const k = ease(Math.min(1, Math.max(0, (a - p.t0) / .38)));
+              p.mesh.position.copy(p.base).addScaledVector(p.out, 1 - k);
+            }
+          }
           rig.rotation.y = (cfg.baseY ?? -.4) + prog * Math.PI * 2 * (cfg.turns ?? 1) + t * (cfg.spin ?? 0) + dragX;
           rig.rotation.x = Math.sin(t * .4) * .05 + (cfg.tiltX ?? 0) + dragY;
           rig.position.y = Math.sin(t * .8) * .1;
