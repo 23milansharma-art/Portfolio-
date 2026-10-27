@@ -1428,22 +1428,8 @@
         Featured <span class="grad-text">projects</span></h2>
       <p data-rv class="text-dim max-w-lg mb-10">Recent creative work crafted for brands, agencies and content creators.
       </p>
-      <div data-rv class="flex flex-wrap gap-2.5 mb-10" id="portTabs" role="tablist">
-        <button
-          class="tab-btn active rounded-full border border-line px-5 py-2 text-[13.5px] text-dim font-head transition-colors hover:text-white">All
-          Works</button>
-        <button
-          class="tab-btn rounded-full border border-line px-5 py-2 text-[13.5px] text-dim font-head transition-colors hover:text-white">UGC
-          Ads</button>
-        <button
-          class="tab-btn rounded-full border border-line px-5 py-2 text-[13.5px] text-dim font-head transition-colors hover:text-white">Meta
-          Ads</button>
-        <button
-          class="tab-btn rounded-full border border-line px-5 py-2 text-[13.5px] text-dim font-head transition-colors hover:text-white">AI
-          Videos</button>
-        <button
-          class="tab-btn rounded-full border border-line px-5 py-2 text-[13.5px] text-dim font-head transition-colors hover:text-white">Reels</button>
-      </div>
+      <!-- tabs are built from the projects list in the script below -->
+      <div data-rv class="flex flex-wrap gap-2.5 mb-10" id="portTabs" role="tablist"></div>
       <div class="swiper port-swiper" data-rv>
         <div class="swiper-wrapper" id="portGrid"></div>
       </div>
@@ -2012,22 +1998,28 @@
           <span class="text-[10.5px] text-dim block mt-1 leading-tight">${l}</span></span>
       </div>`).join('');
 
-    /* portfolio — every slide plays a real local export; the one still is the logo work */
+    /* portfolio — to add a video, add one line: { t: 'Category name', video: 'assets/video/7.mp4' }
+       The name is also the category; a new name gets its own tab automatically. */
     const projects = [
-      { t: 'UGS ADS',  video: 'assets/video/5.mp4' },
+      { t: 'UGC Ads',   video: 'assets/video/5.mp4' },
       { t: 'Meta Ads',  video: 'assets/video/4.mp4' },
-      { t: 'Reels', video: 'assets/video/2.mp4' },
+      { t: 'Reels',     video: 'assets/video/2.mp4' },
       { t: 'AI Videos', video: 'assets/video/1.mp4' },
-      { t: 'Reels',  video: 'assets/video/3.mp4' },
-      { t: 'Reels',  video: 'assets/video/6.mp4' }
+      { t: 'Reels',     video: 'assets/video/3.mp4' },
+      { t: 'Reels',     video: 'assets/video/6.mp4' }
     ];
 
+    const cats = ['All Works', ...new Set(projects.map(p => p.t))];
+    document.getElementById('portTabs').innerHTML = cats.map((c, i) => `
+      <button class="tab-btn${i ? '' : ' active'} rounded-full border border-line px-5 py-2 text-[13.5px] text-dim font-head transition-colors hover:text-white"
+        data-cat="${c}">${c}</button>`).join('');
+
     document.getElementById('portGrid').innerHTML = projects.map(p => `
-      <div class="swiper-slide" data-cat="${p.cat}">
+      <div class="swiper-slide" data-cat="${p.t}">
         <div class="port-card glass rounded-2xl overflow-hidden relative flex flex-col justify-end cursor-pointer">
           ${p.video ? `
             <video class="absolute inset-0 w-full h-full object-cover" src="${p.video}"
-              muted loop playsinline preload="none" aria-label="${p.t}"></video>
+              muted loop playsinline preload="metadata" aria-label="${p.t}"></video>
             <button class="port-mute-btn" aria-pressed="false" aria-label="Unmute video">
               <i class="fa-solid fa-volume-xmark"></i></button>
           ` : `
@@ -2075,10 +2067,7 @@
     tabs.forEach(tab => tab.addEventListener('click', () => {
       tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      // several tab labels wrap across two source lines (e.g. "AI\n  Videos"), so a plain
-      // .trim() leaves the internal newline/indentation in place and it never matches the
-      // project's single-space category string — collapse all internal whitespace too
-      const cat = tab.textContent.trim().replace(/\s+/g, ' ');
+      const cat = tab.dataset.cat;
       document.querySelectorAll('.port-swiper .swiper-slide').forEach(sl => {
         sl.style.display = (cat === 'All Works' || sl.dataset.cat === cat) ? '' : 'none';
       });
@@ -2743,3 +2732,4 @@
 </body>
 
 </html>
+
