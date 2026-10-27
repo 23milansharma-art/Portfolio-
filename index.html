@@ -2018,7 +2018,7 @@
       <div class="swiper-slide" data-cat="${p.t}">
         <div class="port-card glass rounded-2xl overflow-hidden relative flex flex-col justify-end cursor-pointer">
           ${p.video ? `
-            <video class="absolute inset-0 w-full h-full object-cover" src="${p.video}"
+            <video class="absolute inset-0 w-full h-full object-cover" src="${p.video}#t=0.1"
               muted loop playsinline preload="metadata" aria-label="${p.t}"></video>
             <button class="port-mute-btn" aria-pressed="false" aria-label="Unmute video">
               <i class="fa-solid fa-volume-xmark"></i></button>
@@ -2071,7 +2071,12 @@
       document.querySelectorAll('.port-swiper .swiper-slide').forEach(sl => {
         sl.style.display = (cat === 'All Works' || sl.dataset.cat === cat) ? '' : 'none';
       });
-      portSwiper.update(); portSwiper.slideTo(0);
+      portSwiper.update(); portSwiper.slideTo(0, 0);
+      // a slide coming back from display:none doesn't always re-fire the observer, so kick it here
+      document.querySelectorAll('.port-swiper video').forEach(v => {
+        const r = v.getBoundingClientRect();
+        r.width && r.left < innerWidth && !REDUCED ? v.play().catch(() => { }) : v.pause();
+      });
     }));
 
     const why = [
@@ -2732,4 +2737,3 @@
 </body>
 
 </html>
-
